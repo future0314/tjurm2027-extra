@@ -29,7 +29,52 @@
 using namespace std;
 
 // ==================== 在此处编写 Enemy和Target 类 ====================
+// 1. 设计Enemy类
+class Enemy {
+private:
+    std::string id; // 兵种ID
+    double x, y;    // 坐标
 
+public:
+    // 这里确保只有一个 set_data 函数
+    void set_data(std::string _id, double _x, double _y) {
+        id = _id;
+        x = _x;
+        y = _y;
+    }
+
+    std::string get_id() const { return id; }
+    double get_x() const { return x; }
+    double get_y() const { return y; }
+};
+
+// 2. 设计Target类
+class Target {
+private:
+    Enemy enemies[4]; // 题目要求包含一个 Enemy 对象数组
+
+public:
+    void set_enemy(int index, std::string id, double x, double y) {
+        enemies[index].set_data(id, x, y);
+    }
+
+    void find_and_print() {
+        double min_dist = -1.0;
+        std::string best_id = "";
+
+        for (int i = 0; i < 4; i++) {
+            double dx = enemies[i].get_x();
+            double dy = enemies[i].get_y();
+            double dist_sq = dx * dx + dy * dy;
+
+            if (min_dist < 0 || dist_sq < min_dist) {
+                min_dist = dist_sq;
+                best_id = enemies[i].get_id();
+            }
+        }
+        std::cout << "answer: " << best_id << std::endl;
+    }
+}; // 必须带有分号
 
 
 // ====================================================================
@@ -40,15 +85,15 @@ int main() {
 
     for (int i = 0; i < 4; i++) {
         double x, y;
-        char id;
+        std::string id;
         cout << "请输入第 " << i + 1 << " 个目标的兵种ID和坐标(x y): ";
         cin >> id >> x >> y;
 
-        //在此处调用你的Enemy的设置函数，传入id,x,y
+        target.set_enemy(i, id, x, y);
         
     }
 
-    // 调用查找并输出最佳目标
+    target.find_and_print();
 
     return 0;
 }
