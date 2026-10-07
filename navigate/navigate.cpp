@@ -87,4 +87,68 @@ class MAP_BASE
 */
 
 //IMPLEMENT YOUR CODE HERE
+class MyRobot : public MAP_BASE {
+public:
+    void solve() {
+        // 1. 确定起点和终点坐标 (假设外围都是墙，则起点是1,1，终点是倒数第二排和倒数第二列)
+        int startX = 1, startY = 1;
+        int endX = map_in.size() - 2;
+        int endY = map_in[0].size() - 2;
 
+        // 2. 定义四个移动方向：下、上、右、左
+        int dx[4] = {1, -1, 0, 0};
+        int dy[4] = {0, 0, 1, -1};
+
+        // 3. 队列用于BFS，存储坐标对 (x, y)
+        std::queue<std::pair<int, int>> q;
+        q.push({startX, startY});
+        visit[startX][startY] = true;
+
+        // 4. 记录每个点的“父节点”，用于最后回溯路径
+        std::pair<int, int> parent[100][100];
+
+        // 5. 开始BFS搜索
+        while (!q.empty()) {
+            auto [x, y] = q.front();
+            q.pop();
+
+            // 如果到达终点，提前结束搜索
+            if (x == endX && y == endY) {
+                break;
+            }
+
+            // 尝试向四个方向移动
+            for (int i = 0; i < 4; i++) {
+                int nx = x + dx[i];
+                int ny = y + dy[i];
+
+                // 检查边界、是否是障碍物、是否已经走过
+                if (nx >= 0 && nx < map_in.size() && ny >= 0 && ny < map_in[0].size() &&
+                    map_in[nx][ny] != '#' && !visit[nx][ny]) {
+                    
+                    visit[nx][ny] = true;
+                    parent[nx][ny] = {x, y}; // 记录它是从 (x, y) 走过来的
+                    q.push({nx, ny});
+                }
+            }
+        }
+
+        // 6. 回溯路径（从终点倒着走回起点，把 '.' 改成 'C'）
+        int curX = endX, curY = endY;
+        while (curX != startX || curY != startY) {
+            map_in[curX][curY] = 'C';
+            auto p = parent[curX][curY];
+            curX = p.first;
+            curY = p.second;
+        }
+        map_in[startX][startY] = 'C'; // 标记起点
+
+        // 7. 调用基类的打印函数输出地图
+        print(map_in);
+    }
+};
+int main() {
+	MyRobot robot;
+	robot.solve() ;
+	return 0;
+}
